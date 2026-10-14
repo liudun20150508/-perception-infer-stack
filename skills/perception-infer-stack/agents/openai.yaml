@@ -1,0 +1,4 @@
+interface:
+  display_name: "Perception Infer Stack"
+  short_description: "感知推理基础设施：算子、引擎、评测与门禁"
+  default_prompt: "用 $perception-infer-stack 跑一遍感知推理链路，给出延迟与 mAP 的联表结果和门禁判定。"

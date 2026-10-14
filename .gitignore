@@ -1,0 +1,39 @@
+# 构建产物
+bin/
+build/
+build-*/
+*.o
+*.so
+*.a
+
+# 就地编译出来的可执行文件（无扩展名）
+dag_exec
+soft_render
+os_bench
+perception_ops
+
+*.ppm
+
+# 崩溃转储
+core.*
+
+# 运行产物（保留目录，忽略内容）
+report/*
+!report/.gitkeep
+
+# 下载的数据与权重（用 scripts/fetch_data.sh 获取）
+data/coco128/
+data/*.zip
+*.pt
+*.onnx
+!data/samples/**
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# 编辑器
+.vscode/
+.idea/
+*.swp

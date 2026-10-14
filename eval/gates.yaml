@@ -1,0 +1,45 @@
+# 验收判据（规则引擎输入）—— 把"什么算达标"写成机器可判的规则。
+# 由 eval/run_gates.py 执行：全部满足退出码 0，否则非 0（可直接卡在 CI 上）。
+#
+# 字段说明：
+#   left / right : 取值路径（相对 report 文件根，用 . 分隔）
+#   op           : abs_diff_le | diff_le | ratio_ge | le | ge | has_keys
+#   value        : 阈值
+version: 1
+
+# 被测报告：由 src/engine/run_pipeline.py 产出
+report: report/engine/report.json
+
+gates:
+  - id: engine-fp32-parity
+    desc: engine-FP32 与 torch-FP32 的 mAP50 偏差不超过 0.02（导出不改变精度）
+    left: backends.engine-FP32.mAP50
+    right: backends.torch-FP32.mAP50
+    op: abs_diff_le
+    value: 0.02
+
+  - id: int8-accuracy-budget
+    desc: INT8 相对 FP32 的 mAP50 掉点不超过 0.05（降精度必须带精度预算）
+    left: backends.torch-FP32.mAP50
+    right: backends.engine-INT8.mAP50
+    op: diff_le
+    value: 0.05
+
+  - id: int8-speedup
+    desc: INT8 相对 engine-FP32 的 p50 加速比不低于 1.10x（否则量化不值得）
+    left: backends.engine-FP32.p50_ms
+    right: backends.engine-INT8.p50_ms
+    op: ratio_ge
+    value: 1.10
+
+  - id: p99-latency-budget
+    desc: engine-FP32 的 p99 端到端延迟不超过 40ms（车端单帧预算量级）
+    left: backends.engine-FP32.p99_ms
+    op: le
+    value: 40
+
+  - id: backend-coverage
+    desc: 三个后端必须齐全（防止评测悄悄少跑一个后端）
+    left: backends
+    op: has_keys
+    value: [torch-FP32, engine-FP32, engine-INT8]
